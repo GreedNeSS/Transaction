@@ -1,0 +1,11 @@
+{
+  "name": "transaction",
+  "version": "1.0.0",
+  "description": "",
+  "main": "1-proxy.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "GreeD",
+  "license": "ISC"
+}
