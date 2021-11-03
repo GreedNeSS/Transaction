@@ -3,11 +3,9 @@
 // Interface definition
 
 class Transaction {
-	constructor(data, calcProp) {
+	constructor(data) {
 		this.delta = {};
 		this.data = data;
-		this.calcProp = calcProp;
-
 		this.events = {
 			commit: [], rollback: [], timeout: [], set: [], get: [], revoke: []
 		};
@@ -17,14 +15,13 @@ class Transaction {
 		this.arrayAfterEvents = {
 			commit: [], rollback: [], timeout: [], set: [], get: [], revoke: []
 		};
-
 		this.isCreated = false;
 		this.emit = this.emit.bind(this);
 		this.emitBeforeEvent = this.emitBeforeEvent.bind(this);
 	}
 
-	static start(data, calcProp) {
-		const transaction = new Transaction(data, calcProp);
+	static start(data) {
+		const transaction = new Transaction(data);
 		const obj = transaction.createProxy();
 		return [obj, transaction];
 	}
@@ -32,12 +29,11 @@ class Transaction {
 	createProxy() {
 		if (!this.isCreated) {
 			this.isCreated = true;
-			const { delta, emit, emitBeforeEvent, calcProp } = this;
+			const { delta, emit, emitBeforeEvent, data } = this;
 			const { proxy, revoke } = Proxy.revocable(data, {
 				get(target, key) {
 					emitBeforeEvent('get');
 					if (key === 'delta') return delta;
-					if (calcProp.hasOwnProperty(key)) return calcProp[key]();
 					if (delta.hasOwnProperty(key)) return delta[key];
 					emit('get');
 					return target[key];
@@ -63,9 +59,6 @@ class Transaction {
 			});
 
 			this._revoke = revoke;
-			for (const key of Object.keys(this.calcProp)) {
-				this.calcProp[key] = this.calcProp[key].bind(proxy);
-			}
 
 			return proxy;
 		}
@@ -76,7 +69,7 @@ class Transaction {
 		console.log('\ncommit transaction');
 		Object.assign(this.data, this.delta);
 		for (const key in this.delta) {
-			delete this.delta[key]
+			delete this.delta[key];
 		}
 		this.emit('commit');
 	}
@@ -85,7 +78,7 @@ class Transaction {
 		this.emitBeforeEvent('rollback');
 		console.log('\nrollback transaction');
 		for (const key in this.delta) {
-			delete this.delta[key]
+			delete this.delta[key];
 		}
 		this.emit('rollback');
 	}
@@ -94,7 +87,7 @@ class Transaction {
 		if (this._revoke) {
 			this.emitBeforeEvent('revoke');
 			this._revoke();
-			this.emit('revoke')
+			this.emit('revoke');
 		}
 	}
 
@@ -150,28 +143,56 @@ class Transaction {
 
 // Usage
 
-const data = { name: 'Marcus Aurelius', born: 121, city: 'Rome' };
+const data = { name: 'Marcus Aurelius', born: 121 };
 
-const cities = {
-	'Roman Empire': ['Rome']
-};
+const [obj, transaction] = Transaction.start(data);
+console.dir({ data });
 
-const [obj, transaction] = Transaction.start(data, {
-	age() {
-		return (
-			new Date().getFullYear() -
-			new Date(this.born + '').getFullYear()
-		);
-	},
-	country() {
-		let result;
-		for (const [key, values] of Object.entries(cities)) {
-			values.forEach(val => {
-				if (val === this.city) result = key;
-			})
-		}
-		return result;
-	}
+transaction.before('set', () => {
+	console.log('before set');
 });
 
-console.dir({ age: obj.age, country: obj.country });
+obj.name = 'Mao Zedong';
+obj.born = 1893;
+obj.city = 'Shaoshan';
+obj.age = (
+	new Date().getFullYear() -
+	new Date(obj.born + '').getFullYear()
+);
+
+transaction.before('rollback', () => {
+	console.log('befor rollback');
+});
+
+transaction.on('rollback', () => {
+	console.log('event rollback');
+});
+
+transaction.after('rollback', () => {
+	console.log('after rollback');
+});
+
+console.dir({ obj });
+console.dir({ delta: transaction.delta });
+transaction.timeout(1000, true, () => {
+	console.log('\ntimeout\n');
+	console.log(transaction.data);
+});
+
+transaction.commit();
+console.dir({ data });
+console.dir({ obj });
+console.dir({ delta: transaction.delta });
+
+obj.born = 1976;
+console.dir({ obj });
+console.dir({ delta: transaction.delta });
+
+transaction.rollback();
+console.dir({ data });
+console.dir({ delta: transaction.delta });
+
+obj.born = 1999;
+
+// transaction.revoke();
+// console.dir({ obj });

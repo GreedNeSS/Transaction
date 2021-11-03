@@ -1,11 +1,19 @@
 {
-  "name": "transaction",
-  "version": "1.0.0",
-  "description": "",
-  "main": "1-proxy.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "GreeD",
-  "license": "ISC"
+	"name": "transaction",
+	"version": "1.0.0",
+	"description": "",
+	"main": "./JavaScript/1-proxy.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "GreedNeSS",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/GreedNeSS/Transaction.git"
+	},
+	"bugs": {
+		"url": "https://github.com/GreedNeSS/Transaction.git"
+	},
+	"homepage": "https://github.com/GreedNeSS/Transaction.git",
+	"license": "MIT"
 }

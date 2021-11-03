@@ -25,6 +25,17 @@ Transaction.start = data => {
 			if (delta.hasOwnProperty(key)) return delta[key];
 			return target[key];
 		},
+
+		// Added handler
+		getOwnPropertyDescriptor: (target, key) => {
+			console.log('getOwnPropertyDescriptor', key);
+			const descriptor = Object.getOwnPropertyDescriptor(
+				delta.hasOwnProperty(key) ? delta : target, key
+			);
+			console.dir(descriptor);
+			return descriptor;
+		},
+
 		set(target, key, value) {
 			console.log('set', key, value);
 			if (target[key] === value) delete delta[key];
@@ -53,13 +64,15 @@ console.log('\noutput with JSON.stringify');
 console.log('data', JSON.stringify(data));
 console.log('transaction', JSON.stringify(transaction));
 
-console.log('\noutput with console.dir:');
+console.log('\noutput with console.dir *:');
 console.dir({ transaction });
 
-console.log('\noutput with for-in:');
+console.log('\noutput with for-in *:');
 for (const key in transaction) {
 	console.log(key, transaction[key]);
 }
+
+console.log('\n* partially fixed, except .city\n');
 
 transaction.commit();
 console.log('data', JSON.stringify(data));

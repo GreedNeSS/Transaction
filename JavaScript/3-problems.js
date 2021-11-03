@@ -47,17 +47,20 @@ console.log('transaction', JSON.stringify(transaction));
 
 transaction.name = 'Mao Zedong';
 transaction.born = 1893;
+transaction.city = 'Shaoshan';
+
+console.log('\noutput with JSON.stringify');
 console.log('data', JSON.stringify(data));
 console.log('transaction', JSON.stringify(transaction));
+
+console.log('\noutput with console.dir:');
+console.dir({ transaction });
+
+console.log('\noutput with for-in:');
+for (const key in transaction) {
+	console.log(key, transaction[key]);
+}
 
 transaction.commit();
-console.log('data', JSON.stringify(data));
-console.log('transaction', JSON.stringify(transaction));
-
-transaction.born = 1976;
-console.log('data', JSON.stringify(data));
-console.log('transaction', JSON.stringify(transaction));
-
-transaction.rollback();
 console.log('data', JSON.stringify(data));
 console.log('transaction', JSON.stringify(transaction));

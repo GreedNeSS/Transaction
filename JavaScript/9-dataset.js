@@ -73,18 +73,18 @@ class DatasetTransaction {
 			this.opetarions.map(operation => {
 				person.on(operation, delta => {
 					this.log.push({ id, time: new Date(), operation, delta });
-				})
-			})
-		})
+				});
+			});
+		});
 	}
 
 	static start(dataset) {
-		const proxedDataset = dataset.map((obj) => Transaction.start(obj));
+		const proxedDataset = dataset.map(obj => Transaction.start(obj));
 		return new DatasetTransaction(proxedDataset);
 	}
 
 	commit() {
-		this.dataset.map((person) => person.commit());
+		this.dataset.map(person => person.commit());
 	}
 
 	rollback(id) {
@@ -106,7 +106,7 @@ class DatasetTransaction {
 			} else {
 				this.dataset.map(person => {
 					person.rollback();
-				})
+				});
 			}
 
 			if (listener) listener();

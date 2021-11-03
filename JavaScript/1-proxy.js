@@ -23,7 +23,7 @@ const start = data => {
 	});
 };
 
-// Usage 
+// Usage
 
 const data = {
 	name: 'Marcus Aurelius',
@@ -35,8 +35,8 @@ console.log('data.born', data.born);
 
 const transaction = start(data);
 
-transaction.name = 'Mao Zedong',
-	transaction.born = 1893;
+transaction.name = 'Mao Zedong';
+transaction.born = 1893;
 
 console.log('data.name', data.name);
 console.log('data.born', data.born);
